@@ -24,7 +24,7 @@ COPY --from=build /opt/app/src ./src
 COPY --from=build /opt/app/config ./config
 COPY --from=build /opt/app/favicon.png ./favicon.png
 
-RUN groupadd -r strapi && useradd -r -g strapi strapi \
+RUN groupadd -r strapi && useradd -r -m -g strapi strapi \
     && chown -R strapi:strapi /opt/app
 USER strapi
 

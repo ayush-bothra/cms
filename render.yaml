@@ -36,3 +36,5 @@ services:
         generateValue: true
       - key: STRAPI_TELEMETRY_DISABLED
         value: "true"
+      - key: DATABASE_SSL_REJECT_UNAUTHORIZED
+        value: "false"
