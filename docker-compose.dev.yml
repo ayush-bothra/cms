@@ -1,0 +1,10 @@
+services:
+  strapi:
+    command: npm run develop
+    user: root
+    environment:
+      NODE_ENV: development
+    volumes:
+      - ./src:/opt/app/src
+      - ./config:/opt/app/config
+      - ./database:/opt/app/database

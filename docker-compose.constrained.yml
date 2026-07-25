@@ -1,0 +1,14 @@
+# Usage: docker compose -f docker-compose.yml -f docker-compose.constrained.yml up
+#
+# Constrains the Strapi container to Render's free-tier web service spec
+# (512 MB RAM, 0.1 vCPU) so the "local" run isolates software-level bottlenecks
+# from network/virtualization effects, holding hardware constant against Render.
+#
+# NOTE: Render's free Postgres instance has its own (separate) resource limits —
+# check Render's current Postgres free-tier spec and mirror it below on the
+# `postgres` service too if you want full hardware parity, not just the web service.
+services:
+  strapi:
+    mem_limit: 512m
+    memswap_limit: 512m   # prevents swap from masking the memory ceiling
+    cpus: 0.1
