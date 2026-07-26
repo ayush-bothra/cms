@@ -7,11 +7,18 @@ itself at test-start (which was causing a thundering-herd problem
 when every simulated user fetched this independently).
 """
 
+import argparse
 import json
 import sys
 import requests
 
-STRAPI_URL = "http://127.0.0.1:1337"
+parser = argparse.ArgumentParser()
+parser.add_argument(
+    "--host", required=True, help="Base URL of strapi to fetch IDs from"
+)
+args = parser.parse_args()
+
+STRAPI_URL = args.host.rstrip("/")
 
 resp = requests.get(f"{STRAPI_URL}/api/articles?pagination[pageSize]=100")
 if resp.status_code != 200:

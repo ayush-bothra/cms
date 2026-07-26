@@ -10,5 +10,9 @@
 services:
   strapi:
     mem_limit: 512m
-    memswap_limit: 512m   # prevents swap from masking the memory ceiling
+    memswap_limit: 512m # prevents swap from masking the memory ceiling
     cpus: 0.1
+  redis:
+    mem_limit: 25m
+    memswap_limit: 25m
+    command: redis-server --maxmemory 20mb --maxmemory-policy allkeys-lru

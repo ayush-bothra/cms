@@ -14,6 +14,10 @@ services:
       timeout: 5s
       retries: 5
 
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+
   strapi:
     build: .
     restart: unless-stopped
@@ -30,6 +34,8 @@ services:
       DATABASE_PASSWORD: strapi
       DATABASE_SSL: "false"
       STRAPI_TELEMETRY_DISABLED: "true"
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
       # Generate real values with: openssl rand -base64 32 (repeat per key)
       APP_KEYS: ${APP_KEYS}
       API_TOKEN_SALT: ${API_TOKEN_SALT}

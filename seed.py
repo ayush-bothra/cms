@@ -1,28 +1,52 @@
 import requests
 
-STRAPI_URL = "http://127.0.0.1:1337"
-API_TOKEN = "99a2c6039eca21ca6dfcbfeb9b89c6fa211de4fafb5d16382f1872384fdddc5da0fde6e3a71acd92f08974da53845f34a06860377ebe2a4a4ec0b8d0bd5cc8819e50cabfd433c293370a25dd7870518ec7d0e95aa90eb0d8648060432d136d150195f052df7e73f8323f5f2883feba02692db16ef5609c7f07efb5500b6c9a9f"
+STRAPI_URL = "https://cms-strapi-4vy8.onrender.com"
+API_TOKEN = "3679ad6d7de6e052271e02b28bc5090b137f758e9d3485702b8e0aefe78640d1166a8637f865e03cc7f319a3ae55dae6c1ece8beb74f30549a861d461ebd82a0f1a18543f18fc49cb27cdb4c9ca5c5ff7f1bd4fa8412ce3e3f415edf5349bd652be2ee569a0de233c6cc39d7eb3e48c09133c3eeeeb7dbc059536d3b7f882400"
 
 headers = {"Authorization": f"Bearer {API_TOKEN}"}
 
-resp = requests.get(
-    f"{STRAPI_URL}/api/articles?pagination[pageSize]=100", headers=headers
-)
-articles = resp.json()["data"]
-print(f"fetched {len(articles)} articles")
+sample_titles = [
+    "Notes on load testing",
+    "System Design Basics",
+    "Postgres tuning",
+    "Caching Strategies",
+]
 
-for i, article in enumerate(articles):
-    doc_id = article["documentId"]
+created = 0
+for i in range(100):
     payload = {
         "data": {
-            "body": f"Sample body for load testing purposes, entry {i} \n" * 20,
+            "Title": f"{sample_titles[i % len(sample_titles)]} #{i}",
+            "body": f"Sample body for load testing, entry {i}. \n" * 20,
+            "Author": f"Author #{i % 100 + 1}",
         }
     }
 
-    resp = requests.put(
-        f"{STRAPI_URL}/api/articles/{doc_id}", json=payload, headers=headers
-    )
-    if resp.status_code not in (200, 201):
+    resp = requests.post(f"{STRAPI_URL}/api/articles", json=payload, headers=headers)
+    if resp.status_code not in {200, 201}:
         print(f"Failed at {i}: {resp.status_code}; {resp.text}")
+    else:
+        created += 1
 
+print(f"created {created}/100 articles")
+# resp = requests.get(
+#     f"{STRAPI_URL}/api/articles?pagination[pageSize]=100", headers=headers
+# )
+# articles = resp.json()["data"]
+# print(f"fetched {len(articles)} articles")
+#
+# for i, article in enumerate(articles):
+#     doc_id = article["documentId"]
+#     payload = {
+#         "data": {
+#             "body": f"Sample body for load testing purposes, entry {i} \n" * 20,
+#         }
+#     }
+#
+#     resp = requests.put(
+#         f"{STRAPI_URL}/api/articles/{doc_id}", json=payload, headers=headers
+#     )
+#     if resp.status_code not in (200, 201):
+#         print(f"Failed at {i}: {resp.status_code}; {resp.text}")
+#
 print("Done.")
