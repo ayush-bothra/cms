@@ -20,7 +20,7 @@ const deniedExecutableTypes = [
   "application/x-mach-binary",
 ];
 
-const URL = require("url");
+const { URL } = require("url");
 
 function getRedisConnection(env) {
   const redisURL = env("REDIS_URL");
