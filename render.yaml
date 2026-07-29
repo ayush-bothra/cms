@@ -43,3 +43,45 @@ services:
           type: keyvalue
           name: cms-redis-key
           property: connectionString
+  - type: pserv
+    name: cms-loadtest
+    runtime: image
+    image:
+      url: docker.io/grafana/k6:latest
+    plan: free
+    region: oregon
+    envVars:
+      - key: K6_PROMETHEUS_RW_SERVER_URL
+        value: http://cms-prometheus:9090/api/v1/write
+    startCommand: "sleep infinity"
+  - type: web
+    name: cms-prometheus
+    runtime: docker
+    dockerfilePath: ./monitoring/prometheus.Dockerfile
+    plan: free
+    region: oregon
+    envVars:
+      - key: PORT
+        value: "9090"
+    disk:
+      name: prom-data
+      mountPath: /prometheus
+      sizeGB: 1
+  - type: web
+    name: cms-grafana
+    runtime: image
+    image:
+      url: docker.io/grafana/grafana:latest
+    plan: free
+    region: oregon
+    envVars:
+      - key: PORT
+        value: "3000"
+      - key: GF_SECURITY_ADMIN_PASSWORD
+        generateValue: true
+      - key: GF_AUTH_ANONYMOUS_ENABLED
+        value: "true"
+    disk:
+      name: grafana-data
+      mountPath: /var/lib/grafana
+      sizeGB: 1

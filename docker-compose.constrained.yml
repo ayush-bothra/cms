@@ -16,3 +16,44 @@ services:
     mem_limit: 25m
     memswap_limit: 25m
     command: redis-server --maxmemory 20mb --maxmemory-policy allkeys-lru
+  k6:
+    image: grafana/k6
+    networks:
+      - default
+    environment:
+      - K6_PROMETHEUS_RW_SERVER_URL=http://prometheus:9090/api/v1/write
+    volumes:
+      - ./scripts/script.js:/scripts/script.js:ro
+      - ./document_ids.json:/scripts/document_ids.json:ro
+      - ./results:/results
+    entrypoint: ["sh", "-c"]
+    command:
+      - "k6 run -o experimental-prometheus-rw /scripts/script.js"
+    profiles: ["tools"]
+  prometheus:
+    image: prom/prometheus:latest
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --web.enable-remote-write-receiver
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    ports:
+      - "9090:9090"
+    profiles: ["tools"]
+  grafana:
+    image: grafana/grafana:latest
+    volumes:
+      - grafana-data:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+    depends_on:
+      - prometheus
+    ports:
+      - "3001:3000"
+    profiles: ["tools"]
+
+volumes:
+  prometheus-data:
+  grafana-data:

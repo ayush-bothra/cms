@@ -17,6 +17,7 @@ Failure Count per endpoint, plus an "Aggregated" row across all endpoints).
 import argparse
 import subprocess
 import sys
+import json
 from pathlib import Path
 
 # Adjust this list to whatever load levels you want in your sweep.
@@ -28,23 +29,25 @@ SPAWN_RATE = "5"
 
 
 def run_one(env: str, host: str, users: int, results_dir: Path) -> None:
-    csv_prefix = results_dir / f"results_{env}_u{users}"
+    summary_filename = f"results_{env}_u{users}.json"
     cmd = [
-        "locust",
+        "docker",
+        "compose",
         "-f",
-        "locustfile.py",
-        "--host",
-        host,
-        "--users",
-        str(users),
-        "--spawn-rate",
-        SPAWN_RATE,
-        "--run-time",
-        RUN_TIME,
-        "--headless",
-        "--csv",
-        str(csv_prefix),
-        "--csv-full-history",
+        "docker-compose.yml",
+        "-f",
+        "docker-compose.contrained.yml",
+        "run",
+        "--rm",
+        "-e",
+        f"BASE_URL={host}",
+        "-e",
+        f"VUS={users}",
+        "-e",
+        f"DURATION={DURATION}",
+        "-e",
+        f"SUMMARY_FILE={summary_filename}",
+        "k6",
     ]
     print(f"\n{'='*60}")
     print(f"Running: env={env} users={users} host={host}")
@@ -54,10 +57,11 @@ def run_one(env: str, host: str, users: int, results_dir: Path) -> None:
         # Locust exits 1 when there were failed requests during the run —
         # that's expected/interesting data, not a crash. Anything else,
         # stop the sweep rather than silently produce a gap in your table.
-        print(
-            f"WARNING: locust exited with unexpected code {result.returncode} for users={users}"
-        )
+        print(f"WARNING: k6 exited with code {result.returncode} for users={users}")
         sys.exit(result.returncode)
+
+    with open(results_dir / summary_filename) as f:
+        return json.load(f)
 
 
 def main():
