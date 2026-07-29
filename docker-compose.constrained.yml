@@ -22,6 +22,7 @@ services:
       - default
     environment:
       - K6_PROMETHEUS_RW_SERVER_URL=http://prometheus:9090/api/v1/write
+      - BASE_URL=https://cms-strapi-4vy8.onrender.com
     volumes:
       - ./scripts/script.js:/scripts/script.js:ro
       - ./document_ids.json:/scripts/document_ids.json:ro
