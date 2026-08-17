@@ -3,12 +3,14 @@ databases:
     databaseName: strapi
     user: strapi
     plan: free
+    region: singapore
 
 services:
   - type: web
     name: cms-strapi
     runtime: docker
     plan: free
+    region: singapore
     dockerfilePath: ./Dockerfile
     healthCheckPath: /_health
     envVars:
@@ -49,7 +51,7 @@ services:
     image:
       url: docker.io/grafana/k6:latest
     plan: free
-    region: oregon
+    region: singapore
     envVars:
       - key: K6_PROMETHEUS_RW_SERVER_URL
         value: http://cms-prometheus:9090/api/v1/write
@@ -59,21 +61,21 @@ services:
     runtime: docker
     dockerfilePath: ./monitoring/prometheus.Dockerfile
     plan: free
-    region: oregon
+    region: singapore
     envVars:
       - key: PORT
         value: "9090"
-    disk:
-      name: prom-data
-      mountPath: /prometheus
-      sizeGB: 1
+    # disk:
+    #   name: prom-data
+    #   mountPath: /prometheus
+    #   sizeGB: 1
   - type: web
     name: cms-grafana
     runtime: image
     image:
       url: docker.io/grafana/grafana:latest
     plan: free
-    region: oregon
+    region: singapore
     envVars:
       - key: PORT
         value: "3000"
@@ -81,7 +83,7 @@ services:
         generateValue: true
       - key: GF_AUTH_ANONYMOUS_ENABLED
         value: "true"
-    disk:
-      name: grafana-data
-      mountPath: /var/lib/grafana
-      sizeGB: 1
+    # disk:
+    #   name: grafana-data
+    #   mountPath: /var/lib/grafana
+    #   sizeGB: 1
